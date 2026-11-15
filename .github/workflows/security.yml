@@ -23,3 +23,17 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  semgrep:
+    name: Analisar seguranca do codigo
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep:latest
+
+    steps:
+      - name: Baixar codigo do repositorio
+        uses: actions/checkout@v4
+
+      - name: Executar Semgrep
+        run: semgrep scan --config auto --error .
