@@ -1,6 +1,10 @@
 
 FROM nginxinc/nginx-unprivileged:stable-alpine
 
+USER root
+
+RUN apk upgrade --no-cache
+
 # Copia somente os arquivos do site
 COPY --chown=101:101 app/ /usr/share/nginx/html/
 

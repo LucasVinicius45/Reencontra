@@ -37,3 +37,24 @@ jobs:
 
       - name: Executar Semgrep
         run: semgrep scan --config auto --error .
+
+  trivy:
+    name: Verificar vulnerabilidades Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar codigo do repositorio
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Construir imagem Docker
+        run: docker build --pull --no-cache -t reencontra-web:ci .
+
+      - name: Analisar imagem com Trivy
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            reencontra-web:ci
