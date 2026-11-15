@@ -1,0 +1,25 @@
+
+name: Reencontra - Security CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Verificar credenciais expostas
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar codigo do repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Executar Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
