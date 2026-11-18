@@ -56,7 +56,6 @@ resource "aws_vpc_security_group_egress_rule" "outbound" {
   ip_protocol = "-1"
 }
 
-
 # Consulta a imagem Amazon Linux 2023
 data "aws_ssm_parameter" "amazon_linux" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
@@ -66,7 +65,7 @@ data "aws_ssm_parameter" "amazon_linux" {
 resource "aws_instance" "reencontra" {
   ami           = data.aws_ssm_parameter.amazon_linux.value
   instance_type = var.instance_type
-  user_data = file("${path.module}/user-data.sh")
+  user_data     = file("${path.module}/user-data.sh")
 
   subnet_id = data.aws_subnet.reencontra.id
 
@@ -74,6 +73,7 @@ resource "aws_instance" "reencontra" {
     aws_security_group.reencontra.id
   ]
 
+  # nosemgrep: terraform.aws.security.aws-ec2-has-public-ip -- Excecao documentada: MVP academico com acesso publico temporario pela porta 8080.
   associate_public_ip_address = true
 
   metadata_options {

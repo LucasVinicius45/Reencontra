@@ -5,6 +5,7 @@ import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from urllib.parse import urlsplit
 
 URL = "http://3.87.36.146:8080/"
 REGIAO = "us-east-1"
@@ -12,10 +13,33 @@ NAMESPACE = "Reencontra/Observabilidade"
 
 
 def medir_requisicao(url):
+    endereco = urlsplit(url)
+
+    if (
+        endereco.scheme not in ("http", "https")
+        or endereco.hostname != "3.87.36.146"
+        or endereco.port != 8080
+        or endereco.username is not None
+        or endereco.password is not None
+    ):
+        raise ValueError("Endereco de monitoramento nao autorizado.")
+
     inicio = time.perf_counter()
 
     try:
-        with urllib.request.urlopen(url, timeout=10) as resposta:
+        requisicao = urllib.request.Request(
+            url,
+            method="GET"
+        )
+
+        # Evita redirecionamentos automaticos para outros destinos.
+        class SemRedirecionamento(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                return None
+
+        opener = urllib.request.build_opener(SemRedirecionamento)
+
+        with opener.open(requisicao, timeout=10) as resposta:
             status = resposta.status
             resposta.read()
 
