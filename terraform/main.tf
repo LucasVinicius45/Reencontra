@@ -62,6 +62,9 @@ data "aws_ssm_parameter" "amazon_linux" {
 }
 
 # Servidor EC2 do Reencontra
+# Excecao de seguranca: IP publico temporario para demonstracao academica.
+# Risco aceito apenas no laboratorio, nao recomendado para producao.
+# nosemgrep: terraform.aws.security.aws-ec2-has-public-ip.aws-ec2-has-public-ip
 resource "aws_instance" "reencontra" {
   ami           = data.aws_ssm_parameter.amazon_linux.value
   instance_type = var.instance_type
@@ -73,7 +76,6 @@ resource "aws_instance" "reencontra" {
     aws_security_group.reencontra.id
   ]
 
-  # nosemgrep: terraform.aws.security.aws-ec2-has-public-ip -- Excecao documentada: MVP academico com acesso publico temporario pela porta 8080.
   associate_public_ip_address = true
 
   metadata_options {
